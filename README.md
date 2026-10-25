@@ -483,7 +483,7 @@ If the candidate encounters a secondary error within window $W$, it receives a s
 If all phrase-level and minimum-cost candidates fail or exceed the maximum cost budget ($\text{maxCost} = 20.0$), the parser falls back to **Panic-Mode Synchronization**:
 - Retrieves the active nonterminal's synchronization set (FOLLOW set):
 
-$$\mathrm{SyncSet}(\text{Stmt}) = \left\{ \text{';'}, \; '\rbrace', \; \text{'int'}, \; \text{'float'}, \; \text{'return'}, \; \text{'if'}, \; \text{'while'}, \; \text{'for'}, \; \text{EOF} \right\}$$
+$$\mathrm{SyncSet}(\text{Stmt}) = \lbrace \text{';'}, \; \text{'}\rbrace\text{'}, \; \text{'int'}, \; \text{'float'}, \; \text{'return'}, \; \text{'if'}, \; \text{'while'}, \; \text{'for'}, \; \text{EOF} \rbrace$$
 
 - Tokens are consumed and discarded until a synchronizing token is reached.
 - The discarded tokens are wrapped in a typed `PartialNode`, allowing the parser to cleanly resume without deadlocking or crashing.
