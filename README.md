@@ -482,7 +482,9 @@ If the candidate encounters a secondary error within window $W$, it receives a s
 
 If all phrase-level and minimum-cost candidates fail or exceed the maximum cost budget ($\text{maxCost} = 20.0$), the parser falls back to **Panic-Mode Synchronization**:
 - Retrieves the active nonterminal's synchronization set (FOLLOW set):
-  $$\mathrm{SyncSet}(\text{Stmt}) = \{ \text{';'}, \text{'\}'}, \text{'int'}, \text{'float'}, \text{'return'}, \text{'if'}, \text{'while'}, \text{'for'}, \text{EOF} \}$$
+
+$$\mathrm{SyncSet}(\text{Stmt}) = \left\{ \text{';'}, \; '\rbrace', \; \text{'int'}, \; \text{'float'}, \; \text{'return'}, \; \text{'if'}, \; \text{'while'}, \; \text{'for'}, \; \text{EOF} \right\}$$
+
 - Tokens are consumed and discarded until a synchronizing token is reached.
 - The discarded tokens are wrapped in a typed `PartialNode`, allowing the parser to cleanly resume without deadlocking or crashing.
 
@@ -540,7 +542,9 @@ flowchart LR
 ### 9.2 Levenshtein Fuzzy Typo Recovery & Confidence Scoring
 When an undeclared identifier is encountered (e.g., `totl = (10 + 20);` or `int final_sum = totl + tax;`):
 1. The engine computes the **Levenshtein Edit Distance** against all active in-scope symbols:
-   $$\text{Similarity}(s_1, s_2) = 1 - \frac{\text{Levenshtein}(s_1, s_2)}{\max(|s_1|, |s_2|)}$$
+
+$$\text{Similarity}(s_1, s_2) = 1 - \frac{\text{Levenshtein}(s_1, s_2)}{\max(|s_1|, |s_2|)}$$
+
 2. Applies prefix/suffix bonuses to model common developer typos (e.g., missed vowel `totl` $\to$ `total`, swapped adjacent characters `ttoal` $\to$ `total`).
 3. Emits structured `SemanticRepairCandidate` records with similarity percentage and confidence scores.
 
