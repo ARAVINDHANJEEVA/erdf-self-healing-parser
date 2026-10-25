@@ -332,7 +332,7 @@ flowchart TD
 
 The architecture strictly adheres to a **pure, functional compiler core** decoupling parser state from the UI:
 
-$$\operatorname{parse}(T, G, C) \longrightarrow (A, D, E)$$
+$$\mathrm{parse}(T, G, C) \longrightarrow (A, D, E)$$
 
 - $T$: Immutable Source Token Stream
 - $G$: Active C (C99/C11) Grammar Specification
@@ -342,7 +342,7 @@ $$\operatorname{parse}(T, G, C) \longrightarrow (A, D, E)$$
 - $E$: Ordered, Schema-Compliant ERDF Event Sequence
 
 The UI layer is an idempotent reactive projection:
-$$\operatorname{renderUI}(\operatorname{reduceErdfEvent}(S_0, E_{0 \dots N}))$$
+$$\mathrm{renderUI}(\mathrm{reduceErdfEvent}(S_0, E_{0 \dots N}))$$
 The UI **never** mutates parser state or decides repairs; it merely visualizes, scrubs, and patches based on the immutable event sequence.
 
 ### 5.3 Tech Stack Overview
@@ -354,7 +354,7 @@ The UI **never** mutates parser state or decides repairs; it merely visualizes, 
 - **Styling & Design:** Tailwind CSS 4.0 with customized dark-mode compiler tokens.
 - **Typography:** JetBrains Mono font family embedded for high-precision code and token lane alignment.
 - **Icons:** Lucide-React 0.475 vector glyphs.
-- **Testing:** Vitest 4.1 running 28 test suites (239 tests) verifying lexer spans, Pratt precedence, cost scoring, blast radius calculation, and bit-exact repeatability.
+- **Testing:** Vitest 4.1 running 28 test suites (245 tests) verifying lexer spans, Pratt precedence, cost scoring, blast radius calculation, and bit-exact repeatability.
 
 ---
 
@@ -445,7 +445,7 @@ The virtual stream overlays an ordered list of `Edit` descriptors on top of the 
 
 Every generated candidate repair $\Delta$ is evaluated against an objective mathematical penalty:
 
-$$\operatorname{Cost}(\Delta) = (\lambda_l \cdot C_l) + (\lambda_s \cdot C_s) + (\lambda_m \cdot C_m) + (\lambda_d \cdot C_d)$$
+$$\mathrm{Cost}(\Delta) = (\lambda_l \cdot C_l) + (\lambda_s \cdot C_s) + (\lambda_m \cdot C_m) + (\lambda_d \cdot C_d)$$
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -474,7 +474,7 @@ $$\operatorname{Cost}(\Delta) = (\lambda_l \cdot C_l) + (\lambda_s \cdot C_s) + 
 
 A repair candidate is not trusted until it proves its stability. The engine clones a sandboxed `SpeculativeRunner` from the failure checkpoint, patches the virtual stream with candidate edits, and parses forward up to $W = 4$ tokens:
 
-$$\operatorname{Progress}(\Delta) \ge W \quad \wedge \quad \operatorname{SecondaryErrors}(\Delta) = 0 \implies \text{Candidate Validated}$$
+$$\mathrm{Progress}(\Delta) \ge W \quad \wedge \quad \mathrm{SecondaryErrors}(\Delta) = 0 \implies \text{Candidate Validated}$$
 
 If the candidate encounters a secondary error within window $W$, it receives a severe diagnostic penalty ($C_d = +10.0$) or is outright pruned.
 
@@ -482,7 +482,7 @@ If the candidate encounters a secondary error within window $W$, it receives a s
 
 If all phrase-level and minimum-cost candidates fail or exceed the maximum cost budget ($\text{maxCost} = 20.0$), the parser falls back to **Panic-Mode Synchronization**:
 - Retrieves the active nonterminal's synchronization set (FOLLOW set):
-  $$\operatorname{SyncSet}(\text{Stmt}) = \{ \text{';'}, \text{'\}'}, \text{'int'}, \text{'float'}, \text{'return'}, \text{'if'}, \text{'while'}, \text{'for'}, \text{EOF} \}$$
+  $$\mathrm{SyncSet}(\text{Stmt}) = \{ \text{';'}, \text{'\}'}, \text{'int'}, \text{'float'}, \text{'return'}, \text{'if'}, \text{'while'}, \text{'for'}, \text{EOF} \}$$
 - Tokens are consumed and discarded until a synchronizing token is reached.
 - The discarded tokens are wrapped in a typed `PartialNode`, allowing the parser to cleanly resume without deadlocking or crashing.
 
@@ -490,7 +490,7 @@ If all phrase-level and minimum-cost candidates fail or exceed the maximum cost 
 
 Calculates an explainable confidence metric for the winning repair:
 
-$$\operatorname{Confidence} = \operatorname{clamp}\left(1 - \frac{C_{\text{win}}}{C_{\text{max}}}\right) \times \frac{\operatorname{Progress}(c)}{W} \times \operatorname{Margin}(C_{\text{second}} - C_{\text{win}})$$
+$$\mathrm{Confidence} = \mathrm{clamp}\left(1 - \frac{C_{\text{win}}}{C_{\text{max}}}\right) \times \frac{\mathrm{Progress}(c)}{W} \times \mathrm{Margin}(C_{\text{second}} - C_{\text{win}})$$
 
 If the cost difference between the top two viable candidates is smaller than `ambiguityThreshold` ($0.8$), the repair is flagged as **Ambiguous** (`isAmbiguous: true`).
 
